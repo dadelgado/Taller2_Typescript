@@ -1,7 +1,7 @@
 import { dataCourses } from "./dataCourses.js";
 import { dataStudent } from "./dataStudent.js";
 var coursesTbody = document.getElementById('courses');
-var studentTbody = document.getElementById('student');
+var coursesFiltered = dataCourses;
 var btnfilterByName = document.getElementById("button-filterByName");
 var btnfilterByCredits = document.getElementById("button-filterByCredits");
 var inputSearchBox = document.getElementById("search-box");
@@ -40,7 +40,7 @@ function applyFilterByName() {
     var text = inputSearchBox.value;
     text = (text == null) ? '' : text;
     clearCoursesInTable();
-    var coursesFiltered = searchCourseByName(text, dataCourses);
+    coursesFiltered = searchCourseByName(text, dataCourses);
     renderCoursesInTable(coursesFiltered);
     totalCreditElm.innerHTML = "" + getTotalCredits(coursesFiltered);
 }
@@ -48,9 +48,9 @@ function applyFilterByCredits() {
     var min = Number(inputMinBox.value);
     var max = Number(inputMaxBox.value);
     min = (min == null) ? 0 : min;
-    max = (max == null) ? dataCourses.length : max;
+    max = (max == null) ? Math.max.apply(Math, dataCourses.map(function (o) { return o.credits; })) : max;
     clearCoursesInTable();
-    var coursesFiltered = searchCourseByCredits(min, max, dataCourses);
+    coursesFiltered = searchCourseByCredits(min, max, dataCourses);
     renderCoursesInTable(coursesFiltered);
     totalCreditElm.innerHTML = "" + getTotalCredits(coursesFiltered);
 }
@@ -60,7 +60,7 @@ function searchCourseByName(nameKey, courses) {
     });
 }
 function searchCourseByCredits(min, max, courses) {
-    return min === 0 && max === dataCourses.length ? dataCourses : courses.filter(function (c) {
+    return min === 0 && max === Math.max.apply(Math, dataCourses.map(function (o) { return o.credits; })) ? dataCourses : courses.filter(function (c) {
         return c.credits >= min && c.credits <= max;
     });
 }

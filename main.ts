@@ -4,7 +4,7 @@ import { student } from "./student";
 import { dataStudent } from "./dataStudent";
 
 let coursesTbody: HTMLElement = document.getElementById('courses')!;
-let studentTbody: HTMLElement = document.getElementById('student')!;
+let coursesFiltered: Course[] =dataCourses;
 const btnfilterByName: HTMLElement = document.getElementById("button-filterByName")!;
 const btnfilterByCredits: HTMLElement = document.getElementById("button-filterByCredits")!;
 const inputSearchBox: HTMLInputElement = <HTMLInputElement> document.getElementById("search-box")!;
@@ -51,7 +51,7 @@ function applyFilterByName() {
     let text = inputSearchBox.value;
     text = (text == null) ? '' : text;
     clearCoursesInTable();
-    let coursesFiltered: Course[] = searchCourseByName(text, dataCourses);
+    coursesFiltered = searchCourseByName(text, dataCourses);
     renderCoursesInTable(coursesFiltered);
     totalCreditElm.innerHTML = `${getTotalCredits(coursesFiltered)}`
 }
@@ -60,9 +60,9 @@ function applyFilterByCredits() {
   let min: number = Number(inputMinBox.value);
   let max: number = Number(inputMaxBox.value);
   min = (min == null) ? 0 : min;
-  max = (max == null) ? dataCourses.length : max;
+  max = (max == null) ? Math.max.apply(Math, dataCourses.map(function(o) { return o.credits; })) : max;
   clearCoursesInTable();
-  let coursesFiltered: Course[] = searchCourseByCredits(min, max, dataCourses);
+  coursesFiltered= searchCourseByCredits(min, max, dataCourses);
   renderCoursesInTable(coursesFiltered);
   totalCreditElm.innerHTML = `${getTotalCredits(coursesFiltered)}`
 }
@@ -73,7 +73,7 @@ function searchCourseByName(nameKey: string, courses: Course[]) {
 }
 
 function searchCourseByCredits(min: number, max: number, courses: Course[]) {
-  return min === 0 && max === dataCourses.length ? dataCourses : courses.filter( c => 
+  return min === 0 && max === Math.max.apply(Math, dataCourses.map(function(o) { return o.credits; }))  ? dataCourses : courses.filter( c => 
     c.credits >= min && c.credits <= max);
 }
 
